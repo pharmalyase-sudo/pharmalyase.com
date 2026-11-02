@@ -1,0 +1,30 @@
+const serviceData={
+ regulatory:{title:'Regulatory Intelligence',desc:'Structured research that helps teams understand changing regulatory environments and communicate the implications clearly.',list:['Regulatory landscape summaries','FDA / EMA / CDSCO / ICH monitoring support','Guideline and pathway explainers','Regulatory comparison tables'],fit:'Pharma teams, researchers, startups and students who need clear regulatory research.'},
+ pv:{title:'Pharmacovigilance & Drug Safety',desc:'Evidence-led support for drug-safety research, safety communication and PV learning workflows.',list:['Safety-literature research support','PV concept and process documentation','Drug-safety explainers','Case-based educational materials'],fit:'PV learners, research teams and organizations needing structured safety-content support.'},
+ clinical:{title:'Clinical Research Intelligence',desc:'Clinical-trial and evidence research translated into concise, usable outputs.',list:['Clinical trial landscape scans','Study and evidence summaries','Evidence mapping','Research briefing documents'],fit:'Researchers, CRO support teams, students and healthcare organizations.'},
+ market:{title:'Market & Competitive Intelligence',desc:'Market and competitor research that turns scattered information into decision-ready snapshots.',list:['Therapy-area market snapshots','Competitor and pipeline tracking','Launch and trend monitoring','Opportunity briefs'],fit:'Pharma, biotech and health-tech teams exploring markets or strategic opportunities.'},
+ medical:{title:'Medical & Scientific Communication',desc:'Professional scientific communication for hospitals, seminars, medical teams, researchers and pharma audiences.',list:['Medical and scientific PPT decks','Hospital / seminar presentations','Scientific posters and visuals','Executive briefing documents'],fit:'Hospitals, institutions, medical teams, researchers and pharma organizations.'},
+ validation:{title:'Data Validation & Quality Control',desc:'Structured quality checks to improve consistency, traceability and confidence in pharma-related datasets and outputs.',list:['Source-to-output checks','Data consistency review','Reference reconciliation','QC checklists and workflows'],fit:'Research, analytics and content teams working with structured pharma data.'},
+ writing:{title:'Medical Writing',desc:'Evidence-based writing that makes scientific information easier to understand without losing the underlying meaning.',list:['Literature summaries','Drug and disease explainers','Scientific articles','Website and educational content'],fit:'Pharma, healthcare, research and education audiences.'},
+ evidence:{title:'Evidence Synthesis & HEOR',desc:'Organized evidence research for teams that need a clear picture of the literature and comparative evidence.',list:['Structured literature reviews','Evidence tables','Comparator research','RWE / HEOR background support'],fit:'Researchers, HEOR teams, market-access projects and evidence-focused organizations.'},
+ analytics:{title:'Pharma Analytics & Dashboards',desc:'Simple, decision-friendly analytics that help teams see patterns, KPIs and research findings faster.',list:['KPI frameworks','Research datasets','Analytical summaries','Dashboard-ready data structures'],fit:'Pharma analytics, research, startup and operational teams.'}
+};
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const nav=$('#nav'), menu=$('#menuToggle');
+menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',open);});
+$$('.nav a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');}));
+$('#year').textContent=new Date().getFullYear();
+const progress=$('#progress');
+window.addEventListener('scroll',()=>{const d=document.documentElement;progress.style.width=(d.scrollTop/(d.scrollHeight-d.clientHeight)*100)+'%';},{passive:true});
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.12});
+$$('.reveal').forEach(el=>observer.observe(el));
+const sections=[...$$('main section[id]')], navLinks=[...$$('.nav a[href^="#"]')];
+const sectionObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-35% 0px -55% 0px'});
+sections.forEach(s=>sectionObserver.observe(s));
+const modal=$('#serviceModal'), title=$('#modalTitle'), desc=$('#modalDesc'), list=$('#modalList'), fit=$('#modalFit'), mail=$('#modalMail'), kicker=$('#modalKicker');
+function openService(key){const d=serviceData[key];if(!d)return;title.textContent=d.title;desc.textContent=d.desc;fit.textContent=d.fit;kicker.textContent='SERVICE / '+key.toUpperCase();list.innerHTML=d.list.map(x=>'<li>'+x+'</li>').join('');mail.href='mailto:pharmalyase@gmail.com?subject='+encodeURIComponent('Pharmalyase enquiry: '+d.title);modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('.modal-close').focus(),20);}
+function closeModal(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');}
+$$('.service-card').forEach(card=>{card.addEventListener('click',e=>{if(e.target.closest('.learn-more'))openService(card.dataset.service);});card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openService(card.dataset.service)}});card.setAttribute('tabindex','0');});
+$$('[data-close]').forEach(el=>el.addEventListener('click',closeModal));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal();});
+const toast=$('#toast');function showToast(t){toast.textContent=t;toast.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.classList.remove('show'),1800)}
+$$('.nav a[href^="#"]').forEach(a=>a.addEventListener('click',()=>showToast('Opening '+a.textContent.trim())));
